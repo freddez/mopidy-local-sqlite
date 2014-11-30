@@ -6,6 +6,7 @@ import operator
 import os
 import os.path
 import sqlite3
+import time
 import uritools
 
 from mopidy import local
@@ -164,13 +165,18 @@ class SQLiteLibrary(local.Library):
         query = dict(uritools.urisplit(str(uri)).getquerylist())
         type = query.pop('type', None)
         role = query.pop('role', None)
-
         # TODO: handle these in schema (generically)?
         if type == 'date':
             format = query.get('format', '%Y-%m-%d')
             return map(_dateref, schema.dates(self._connect(), format=format))
         if type == 'genre':
             return map(_genreref, schema.genres(self._connect()))
+        if type == 'last_modified':
+            return map(_lastmodifiedref,
+                       ((7, 'Last 7 days'),
+                       (30, 'Last month'),
+                       (365, 'Last year'))
+            )
 
         roles = role or ('artist', 'albumartist')
 
@@ -277,3 +283,12 @@ def _genreref(genre):
         uri=uritools.uricompose('local', None, 'directory', {'genre': genre}),
         name=genre
     )
+
+def _lastmodifiedref(option):
+    timestamp = int(time.time()) - option[0] * 24*60*1000
+    return Ref.directory(
+        uri=uritools.uricompose('local', None, 'directory',
+                                {'last_modified': timestamp}),
+        name=option[1]
+    )
+

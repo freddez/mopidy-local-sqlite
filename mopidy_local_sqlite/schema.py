@@ -45,6 +45,7 @@ _BROWSE_FILTERS = {
         artist='track.artists = ?',
         composer='track.composers = ?',
         date="track.date LIKE ? || '%'",
+        last_modified="track.last_modified > ?",
         genre='track.genre = ?',
         performer='track.performers = ?'
     ),
