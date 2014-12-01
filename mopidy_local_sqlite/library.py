@@ -175,6 +175,8 @@ class SQLiteLibrary(local.Library):
             return map(_lastmodifiedref,
                        ((7, 'Last 7 days'),
                        (30, 'Last month'),
+                       (92, 'Last 3 months'),
+                       (157, 'Last 6 months'),
                        (365, 'Last year'))
             )
 
